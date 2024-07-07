@@ -97,7 +97,7 @@ class Eliz:
     
     def enviar_email(self, to_email, subject, body):
         gmail_user = "suportedeltatelecom@gmail.com"
-        gmail_password = "@Delta477"
+        gmail_password = "XXXXXX"
         
         email_text = f"From: {gmail_user}\nTo: {to_email}\nSubject: {subject}\n\n{body}"
         
