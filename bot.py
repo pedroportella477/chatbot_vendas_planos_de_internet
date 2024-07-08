@@ -6,7 +6,7 @@ class Eliz:
         print("Olá! Sou Eliz, estou aqui para oferecer a melhor experiência em planos de acesso à internet em ultra velocidade.")
     
     def iniciar_venda(self):
-        resposta = input("Gostaria de fazer o cadastro e receber uma oferta? (Digite 1 para sim, 2 para não): ")
+        resposta = self.obter_input("Gostaria de fazer o cadastro e receber uma oferta? (Digite 1 para sim, 2 para não): ", ['1', '2'])
         if resposta == '2':
             print("Agradecemos o contato! Até logo.")
             return
@@ -18,7 +18,7 @@ class Eliz:
         cep = input("Informe seu CEP: ")
         endereco = self.consultar_endereco(cep)
         print("Endereço encontrado:", endereco)
-        confirmacao_endereco = input("O endereço está correto? (Digite 1 para sim, 2 para não): ")
+        confirmacao_endereco = self.obter_input("O endereço está correto? (Digite 1 para sim, 2 para não): ", ['1', '2'])
         if confirmacao_endereco == '2':
             endereco = input("Por favor, informe seu endereço completo: ")
         
@@ -27,27 +27,18 @@ class Eliz:
         ponto_referencia = input("Informe um ponto de referência: ")
         
         telefone = input("Informe seu telefone para contato: ")
-        whatsapp = input("Você possui WhatsApp? (Digite sim ou não): ")
+        whatsapp = self.obter_input("Você possui WhatsApp? (Digite sim ou não): ", ['sim', 'não'])
         
         email = input("Informe seu e-mail: ")
         
         self.mostrar_planos()
-        plano = input("Selecione o plano desejado (Digite o número correspondente): ")
+        plano = self.obter_input("Selecione o plano desejado (Digite o número correspondente): ", ['1', '2', '3', '4', '5', '6'])
         
-        vencimento = input("Informe a data de vencimento desejada (5, 10, 15, 25): ")
+        vencimento = self.obter_input("Informe a data de vencimento desejada (5, 10, 15, 25): ", ['5', '10', '15', '25'])
         
-        print("\nResumo da Contratação:")
-        print(f"Nome: {nome}")
-        print(f"Data de Nascimento: {data_nascimento}")
-        print(f"CPF/CNPJ: {cpf_cnpj}")
-        print(f"Endereço: {endereco}, {numero_residencia} - {complemento}, {ponto_referencia}")
-        print(f"Telefone: {telefone}")
-        print(f"WhatsApp: {whatsapp}")
-        print(f"E-mail: {email}")
-        print(f"Plano escolhido: {plano} - {self.obter_nome_plano(plano)}")
-        print(f"Data de vencimento: {vencimento}")
+        self.mostrar_resumo(nome, data_nascimento, cpf_cnpj, endereco, numero_residencia, complemento, ponto_referencia, telefone, whatsapp, email, plano, vencimento)
         
-        confirmacao_contratacao = input("Deseja confirmar a contratação? (Digite 1 para sim, 2 para cancelar): ")
+        confirmacao_contratacao = self.obter_input("Deseja confirmar a contratação? (Digite 1 para sim, 2 para cancelar): ", ['1', '2'])
         if confirmacao_contratacao == '2':
             print("Que pena! Lamentamos o cancelamento do seu pedido.")
             return
@@ -60,10 +51,15 @@ class Eliz:
         
     def consultar_endereco(self, cep):
         url = f"https://viacep.com.br/ws/{cep}/json/"
-        response = requests.get(url)
-        data = response.json()
-        endereco = f"{data['logradouro']}, {data['bairro']}, {data['localidade']} - {data['uf']}"
-        return endereco
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+            endereco = f"{data['logradouro']}, {data['bairro']}, {data['localidade']} - {data['uf']}"
+            return endereco
+        except requests.RequestException as e:
+            print(f"Erro ao consultar o CEP: {e}")
+            return "Endereço não encontrado"
     
     def obter_nome_plano(self, plano):
         planos = {
@@ -85,6 +81,18 @@ class Eliz:
         print("5. 300MB")
         print("6. 500MB")
     
+    def mostrar_resumo(self, nome, data_nascimento, cpf_cnpj, endereco, numero_residencia, complemento, ponto_referencia, telefone, whatsapp, email, plano, vencimento):
+        print("\nResumo da Contratação:")
+        print(f"Nome: {nome}")
+        print(f"Data de Nascimento: {data_nascimento}")
+        print(f"CPF/CNPJ: {cpf_cnpj}")
+        print(f"Endereço: {endereco}, {numero_residencia} - {complemento}, {ponto_referencia}")
+        print(f"Telefone: {telefone}")
+        print(f"WhatsApp: {whatsapp}")
+        print(f"E-mail: {email}")
+        print(f"Plano escolhido: {plano} - {self.obter_nome_plano(plano)}")
+        print(f"Data de vencimento: {vencimento}")
+    
     def enviar_email_cliente(self, nome, email):
         subject = "Pedido de Instalação Realizado com Sucesso"
         body = f"Olá {nome},\n\nSeu pedido de instalação foi realizado com sucesso!\n\nAtenciosamente,\nEquipe Delta Telecom"
@@ -97,7 +105,7 @@ class Eliz:
     
     def enviar_email(self, to_email, subject, body):
         gmail_user = "suportedeltatelecom@gmail.com"
-        gmail_password = "XXXXXX"
+        gmail_password = "@Delta477"
         
         email_text = f"From: {gmail_user}\nTo: {to_email}\nSubject: {subject}\n\n{body}"
         
@@ -110,6 +118,13 @@ class Eliz:
             print("E-mail enviado com sucesso!")
         except Exception as e:
             print(f"Erro ao enviar e-mail: {e}")
+    
+    def obter_input(self, mensagem, opcoes_validas):
+        while True:
+            resposta = input(mensagem).strip().lower()
+            if resposta in opcoes_validas:
+                return resposta
+            print("Opção inválida. Tente novamente.")
 
 # Exemplo de uso
 eliz = Eliz()
